@@ -61,7 +61,7 @@ async def start_generation(
     job = await GenerationService.create_job(db, document.id)
 
     # Queue the Celery task (import here to avoid circular imports)
-    from app.workers.tasks import generate_content_task
+    from app.workers.generation_tasks import generate_content_task
 
     celery_task = generate_content_task.delay(job.id)
 
@@ -176,7 +176,7 @@ async def retry_generation_job(
     job = await GenerationService.retry_job(db, job)
 
     # Queue new Celery task
-    from app.workers.tasks import generate_content_task
+    from app.workers.generation_tasks import generate_content_task
 
     celery_task = generate_content_task.delay(job.id)
 
