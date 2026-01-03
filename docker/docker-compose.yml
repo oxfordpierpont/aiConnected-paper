@@ -108,11 +108,11 @@ services:
       - celery-worker
     command: celery -A app.workers.celery_app beat --loglevel=info
 
-  # Next.js Frontend
+  # Next.js Frontend (Development)
   frontend:
     build:
       context: ../frontend
-      dockerfile: ../docker/Dockerfile.frontend
+      dockerfile: ../docker/Dockerfile.frontend.dev
     container_name: paper-frontend
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -122,10 +122,8 @@ services:
     volumes:
       - ../frontend:/app
       - /app/node_modules
-      - /app/.next
     depends_on:
       - backend
-    command: npm run dev
 
   # Flower (Celery Monitoring) - Optional
   flower:
