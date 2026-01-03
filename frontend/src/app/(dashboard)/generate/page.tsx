@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { clientsApi, Client } from "@/lib/api/clients";
-import { generationApi, GenerationStatus, GenerationJob } from "@/lib/api/generation";
+import { generationApi, GenerationJob } from "@/lib/api/generation";
 
 const stepLabels: Record<string, string> = {
   topic_analysis: "Analyzing Topic",
@@ -15,7 +15,7 @@ const stepLabels: Record<string, string> = {
   pdf_rendering: "Rendering PDF",
 };
 
-export default function GeneratePage() {
+function GeneratePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clientParam = searchParams.get("client");
@@ -340,5 +340,19 @@ export default function GeneratePage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function GeneratePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      }
+    >
+      <GeneratePageContent />
+    </Suspense>
   );
 }
