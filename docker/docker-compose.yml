@@ -49,6 +49,9 @@ services:
       - SECRET_KEY=development-secret-key-change-in-production
       - JWT_SECRET_KEY=development-jwt-secret-change-in-production
       - CORS_ORIGINS=["http://localhost:3000"]
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-sonnet-4}
     ports:
       - "8000:8000"
     volumes:
@@ -74,6 +77,9 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - SECRET_KEY=development-secret-key-change-in-production
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-sonnet-4}
     volumes:
       - ../backend:/app
       - backend_storage:/app/storage

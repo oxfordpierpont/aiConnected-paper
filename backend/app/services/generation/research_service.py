@@ -3,7 +3,7 @@
 import json
 from typing import List, Dict, Any
 
-import anthropic
+from openai import OpenAI
 
 from app.config import settings
 
@@ -12,8 +12,11 @@ class ResearchService:
     """Service for conducting web research on topics."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self.model = "claude-sonnet-4-20250514"
+        self.client = OpenAI(
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url=settings.OPENROUTER_BASE_URL,
+        )
+        self.model = settings.OPENROUTER_MODEL
 
     async def research_topic(
         self,
@@ -67,13 +70,17 @@ Provide research findings in the following JSON structure:
 
 Provide substantive, specific research findings that would be valuable for executive-level thought leadership content. Generate realistic but clearly marked as AI-generated statistics and insights."""
 
-        message = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
+            extra_headers={
+                "HTTP-Referer": "https://paper.aiconnected.com",
+                "X-Title": "Paper by aiConnected",
+            },
         )
 
-        response_text = message.content[0].text
+        response_text = response.choices[0].message.content
 
         # Parse JSON from response
         try:
@@ -151,13 +158,17 @@ Provide your analysis in the following JSON structure:
 
 Provide realistic industry insights suitable for executive-level content."""
 
-        message = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}],
+            extra_headers={
+                "HTTP-Referer": "https://paper.aiconnected.com",
+                "X-Title": "Paper by aiConnected",
+            },
         )
 
-        response_text = message.content[0].text
+        response_text = response.choices[0].message.content
 
         try:
             start = response_text.find("{")

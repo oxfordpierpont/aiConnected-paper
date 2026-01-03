@@ -3,7 +3,7 @@
 import json
 from typing import Dict, Any, List, Optional
 
-import anthropic
+from openai import OpenAI
 
 from app.config import settings
 
@@ -12,8 +12,11 @@ class OutlineService:
     """Service for generating document outlines."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self.model = "claude-sonnet-4-20250514"
+        self.client = OpenAI(
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url=settings.OPENROUTER_BASE_URL,
+        )
+        self.model = settings.OPENROUTER_MODEL
 
     async def generate_outline(
         self,
@@ -101,13 +104,17 @@ Create a comprehensive document outline in the following JSON structure:
 
 Create an outline that would result in a compelling, executive-quality thought leadership document with 6-10 main sections."""
 
-        message = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=3000,
             messages=[{"role": "user", "content": prompt}],
+            extra_headers={
+                "HTTP-Referer": "https://paper.aiconnected.com",
+                "X-Title": "Paper by aiConnected",
+            },
         )
 
-        response_text = message.content[0].text
+        response_text = response.choices[0].message.content
 
         try:
             start = response_text.find("{")
@@ -161,13 +168,17 @@ Feedback for refinement:
 
 Please refine the outline based on the feedback and return the updated outline in the same JSON structure. Maintain all fields and improve based on the specific feedback provided."""
 
-        message = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=3000,
             messages=[{"role": "user", "content": prompt}],
+            extra_headers={
+                "HTTP-Referer": "https://paper.aiconnected.com",
+                "X-Title": "Paper by aiConnected",
+            },
         )
 
-        response_text = message.content[0].text
+        response_text = response.choices[0].message.content
 
         try:
             start = response_text.find("{")

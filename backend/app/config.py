@@ -34,7 +34,9 @@ class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
     # External APIs
-    ANTHROPIC_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    OPENROUTER_MODEL: str = "anthropic/claude-sonnet-4"
     FREEPIK_API_KEY: str = ""
 
     # File Storage

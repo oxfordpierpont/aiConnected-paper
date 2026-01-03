@@ -3,7 +3,7 @@
 import json
 from typing import Dict, Any, List, Optional
 
-import anthropic
+from openai import OpenAI
 
 from app.config import settings
 
@@ -12,8 +12,11 @@ class ContentService:
     """Service for generating written content."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self.model = "claude-sonnet-4-20250514"
+        self.client = OpenAI(
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url=settings.OPENROUTER_BASE_URL,
+        )
+        self.model = settings.OPENROUTER_MODEL
 
     async def generate_section(
         self,
@@ -78,13 +81,17 @@ Write the content for this section. Requirements:
 
 Write compelling, professional content:"""
 
-        message = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=word_count * 2,  # Allow some buffer
             messages=[{"role": "user", "content": prompt}],
+            extra_headers={
+                "HTTP-Referer": "https://paper.aiconnected.com",
+                "X-Title": "Paper by aiConnected",
+            },
         )
 
-        return message.content[0].text
+        return response.choices[0].message.content
 
     async def generate_full_document(
         self,
