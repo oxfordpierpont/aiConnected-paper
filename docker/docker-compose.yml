@@ -75,6 +75,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - default
+      - dokploy-network
   celery-worker:
     build:
       context: ../backend
@@ -141,6 +144,21 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-web.rule=Host(`paper.aiconnected.ai`)
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-web.entrypoints=web
+      - traefik.http.services.aiconnectedai-paperaiconnectedai-mcuxon-36-web.loadbalancer.server.port=3000
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-web.service=aiconnectedai-paperaiconnectedai-mcuxon-36-web
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-websecure.rule=Host(`paper.aiconnected.ai`)
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-websecure.entrypoints=websecure
+      - traefik.http.services.aiconnectedai-paperaiconnectedai-mcuxon-36-websecure.loadbalancer.server.port=3000
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-websecure.service=aiconnectedai-paperaiconnectedai-mcuxon-36-websecure
+      - traefik.http.routers.aiconnectedai-paperaiconnectedai-mcuxon-36-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
+    networks:
+      - dokploy-network
   migrations:
     build:
       context: ../backend
