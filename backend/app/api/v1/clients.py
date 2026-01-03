@@ -1,6 +1,7 @@
 """Client endpoints."""
 
-from typing import Annotated, List
+from typing import Annotated
+import math
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,13 +9,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.api.deps import get_current_active_user
 from app.models import User
+from app.services.client_service import ClientService
 from app.schemas.client import ClientCreate, ClientUpdate, ClientResponse
-from app.schemas.common import PaginatedResponse
 
 router = APIRouter()
 
 
-@router.get("", response_model=PaginatedResponse[ClientResponse])
+@router.get("")
 async def list_clients(
     current_user: Annotated[User, Depends(get_current_active_user)],
     db: AsyncSession = Depends(get_db),
@@ -23,13 +24,26 @@ async def list_clients(
     search: str = Query(None),
 ):
     """List all clients for the current agency."""
-    # TODO: Implement client listing with pagination
+    if not current_user.agency_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not associated with an agency",
+        )
+
+    clients, total = await ClientService.list_by_agency(
+        db=db,
+        agency_id=current_user.agency_id,
+        page=page,
+        per_page=per_page,
+        search=search,
+    )
+
     return {
-        "items": [],
-        "total": 0,
+        "items": clients,
+        "total": total,
         "page": page,
         "per_page": per_page,
-        "pages": 0,
+        "pages": math.ceil(total / per_page) if total > 0 else 0,
     }
 
 
@@ -40,11 +54,25 @@ async def create_client(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new client."""
-    # TODO: Implement client creation
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Not implemented",
+    if not current_user.agency_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not associated with an agency",
+        )
+
+    client = await ClientService.create(
+        db=db,
+        agency_id=current_user.agency_id,
+        name=client_data.name,
+        industry=client_data.industry,
+        website=client_data.website,
+        location=client_data.location,
+        description=client_data.description,
+        services=client_data.services,
+        keywords=client_data.keywords,
+        tone=client_data.tone,
     )
+    return client
 
 
 @router.get("/{client_id}", response_model=ClientResponse)
@@ -54,11 +82,19 @@ async def get_client(
     db: AsyncSession = Depends(get_db),
 ):
     """Get a specific client."""
-    # TODO: Implement client retrieval
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="Client not found",
-    )
+    if not current_user.agency_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not associated with an agency",
+        )
+
+    client = await ClientService.get_by_id(db, client_id, current_user.agency_id)
+    if not client:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Client not found",
+        )
+    return client
 
 
 @router.patch("/{client_id}", response_model=ClientResponse)
@@ -69,11 +105,22 @@ async def update_client(
     db: AsyncSession = Depends(get_db),
 ):
     """Update a client."""
-    # TODO: Implement client update
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Not implemented",
-    )
+    if not current_user.agency_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not associated with an agency",
+        )
+
+    client = await ClientService.get_by_id(db, client_id, current_user.agency_id)
+    if not client:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Client not found",
+        )
+
+    update_dict = update_data.model_dump(exclude_unset=True)
+    client = await ClientService.update(db, client, **update_dict)
+    return client
 
 
 @router.delete("/{client_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -83,8 +130,17 @@ async def delete_client(
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a client."""
-    # TODO: Implement client deletion
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Not implemented",
-    )
+    if not current_user.agency_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not associated with an agency",
+        )
+
+    client = await ClientService.get_by_id(db, client_id, current_user.agency_id)
+    if not client:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Client not found",
+        )
+
+    await ClientService.delete(db, client)
