@@ -1,0 +1,74 @@
+{% extends "base/layout.html" %}
+
+{% block extra_styles %}
+/* Executive Template Specific Styles */
+.executive-header {
+    background-color: var(--brand-primary);
+    color: white;
+    padding: 2em;
+    margin: -0.75in -0.75in 2em -0.75in;
+    text-align: center;
+}
+
+.executive-title {
+    font-size: 36pt;
+    font-weight: 700;
+    margin-bottom: 0.5em;
+}
+
+.executive-subtitle {
+    font-size: 14pt;
+    opacity: 0.9;
+}
+{% endblock %}
+
+{% block content %}
+<!-- Cover Page -->
+<div class="cover-page">
+    {% if cover_image %}
+    <img src="{{ cover_image }}" alt="Cover" class="cover-image">
+    {% endif %}
+    <h1 class="cover-title">{{ title }}</h1>
+    {% if subtitle %}
+    <p class="cover-subtitle">{{ subtitle }}</p>
+    {% endif %}
+    {% if logo_url %}
+    <img src="{{ logo_url }}" alt="Logo" class="cover-logo">
+    {% endif %}
+    <p class="cover-date">{{ date }}</p>
+</div>
+
+<!-- Content -->
+{% for section in sections %}
+<section>
+    <span class="section-label">{{ section.label }}</span>
+    <h2>{{ section.title }}</h2>
+
+    {% if section.drop_cap %}
+    <p class="drop-cap">{{ section.content }}</p>
+    {% else %}
+    <p>{{ section.content }}</p>
+    {% endif %}
+
+    {% for stat in section.statistics %}
+    <div class="statistic-callout">
+        <div class="number">{{ stat.value }}</div>
+        <div class="description">{{ stat.description }}</div>
+        <div class="source">Source: {{ stat.source }}</div>
+    </div>
+    {% endfor %}
+
+    {% if section.chart %}
+    <div class="chart-container">
+        <img src="{{ section.chart.image }}" alt="{{ section.chart.title }}">
+        <p class="chart-caption">{{ section.chart.caption }}</p>
+    </div>
+    {% endif %}
+</section>
+{% endfor %}
+
+<!-- Footer -->
+<div class="page-footer">
+    <p>{{ footer_text }} | {{ date }}</p>
+</div>
+{% endblock %}

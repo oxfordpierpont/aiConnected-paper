@@ -1,0 +1,50 @@
+/* Executive Template - Custom Styles */
+
+/* Import base variables */
+@import "../base/variables.css";
+
+/* Executive-specific overrides */
+.cover-page {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
+    color: white;
+    padding: 3em;
+}
+
+.cover-title {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cover-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Section styling */
+section {
+    margin-bottom: 2em;
+}
+
+h2 {
+    border-bottom: 2px solid var(--brand-secondary);
+    padding-bottom: 0.25em;
+}
+
+/* Executive callout boxes */
+.executive-callout {
+    background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-tertiary) 100%);
+    color: white;
+    padding: 1.5em 2em;
+    margin: 1.5em 0;
+    border-radius: 4px;
+}
+
+.executive-callout .title {
+    font-size: 14pt;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+}
+
+.executive-callout .content {
+    font-size: 12pt;
+    line-height: 1.6;
+}
