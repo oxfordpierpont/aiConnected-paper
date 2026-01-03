@@ -1,20 +1,23 @@
 version: "3.8"
 
+# Development Docker Compose for Paper by aiConnected
+# Deploy with: docker-compose up -d
+
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
     container_name: paper-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: content_strategist
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-content_strategist}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -42,16 +45,17 @@ services:
     environment:
       - APP_ENV=development
       - DEBUG=true
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/content_strategist
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-content_strategist}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - SECRET_KEY=development-secret-key-change-in-production
-      - JWT_SECRET_KEY=development-jwt-secret-change-in-production
-      - CORS_ORIGINS=["http://localhost:3000"]
+      - SECRET_KEY=${SECRET_KEY:-devsecretkey32charactersminimum!}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-devjwtsecret32charactersminimum!}
+      - CORS_ORIGINS=${CORS_ORIGINS:-["http://localhost:3000"]}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
-      - OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-sonnet-4}
+      - FREEPIK_API_KEY=${FREEPIK_API_KEY:-}
     ports:
       - "8000:8000"
     volumes:
@@ -72,13 +76,13 @@ services:
     container_name: paper-celery-worker
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/content_strategist
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-content_strategist}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - SECRET_KEY=development-secret-key-change-in-production
+      - SECRET_KEY=${SECRET_KEY:-devsecretkey32charactersminimum!}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
-      - OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-sonnet-4}
     volumes:
       - ../backend:/app
@@ -98,7 +102,7 @@ services:
     container_name: paper-celery-beat
     environment:
       - APP_ENV=development
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/content_strategist
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-content_strategist}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -115,8 +119,8 @@ services:
       dockerfile: ../docker/Dockerfile.frontend.dev
     container_name: paper-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-ws://localhost:8000}
     ports:
       - "3000:3000"
     volumes:
