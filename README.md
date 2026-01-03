@@ -361,6 +361,25 @@ Paper by aiConnected follows the aiConnected brand identity:
 - **Subheadings:** Poppins SemiBold
 - **Body:** Poppins Light
 
+### Logo Assets (`frontend/public/`)
+
+| File | Usage |
+|------|-------|
+| `aiConnected-App-Logo-202_aiConnected-Logo-Horizontal-Dark.svg` | Main logo on light backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Horizontal-Light.svg` | Main logo on dark backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Vertical-Dark.svg` | Stacked logo on light backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Vertical-Light.svg` | Stacked logo on dark backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Powered-By-Dark.svg` | "Powered by" badge (light bg) |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Powered-By-Light.svg` | "Powered by" badge (dark bg) |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Text-Only-Dark.svg` | Text logo on light backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Text-Only-Light.svg` | Text logo on dark backgrounds |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Text-Only-Gray.svg` | Muted text logo |
+| `aiConnected-Logo_aiConnected-Logo-Symbol-Only.svg` | Infinity symbol mark only |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Profile-Picture.svg` | Avatar/profile images |
+| `aiConnected-App-Logo-202_aiConnected-Logo-Favicon.svg` | Browser favicon (SVG) |
+| `aiConnected-Logo_favicon-32x32.svg` | Favicon 32×32 (SVG) |
+| `aiConnected-Logo_favicon-32x32.png` | Favicon 32×32 (PNG) |
+
 ---
 
 ## User Roles
