@@ -4,7 +4,7 @@ from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from python_slugify import slugify
+from slugify import slugify
 
 from app.models import Agency
 
