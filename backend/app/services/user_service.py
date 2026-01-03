@@ -63,7 +63,7 @@ class UserService:
         agency_name: str,
     ) -> tuple[User, Agency]:
         """Create a new user with a new agency."""
-        from python_slugify import slugify
+        from slugify import slugify
 
         # Create agency first
         agency_slug = slugify(agency_name)
