@@ -78,17 +78,17 @@ export const authApi = {
 
 export const agencyApi = {
   getStats: async (): Promise<AgencyStats> => {
-    const response = await apiClient.get("/agency/me/stats");
+    const response = await apiClient.get("/agencies/me/stats");
     return response.data;
   },
 
   getCurrent: async () => {
-    const response = await apiClient.get("/agency/me");
+    const response = await apiClient.get("/agencies/me");
     return response.data;
   },
 
   update: async (data: Record<string, unknown>) => {
-    const response = await apiClient.patch("/agency/me", data);
+    const response = await apiClient.patch("/agencies/me", data);
     return response.data;
   },
 };
