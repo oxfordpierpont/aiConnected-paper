@@ -1,16 +1,25 @@
 """Outline generation service."""
 
-from typing import Dict, Any, List
+import json
+from typing import Dict, Any, List, Optional
+
+import anthropic
+
+from app.config import settings
 
 
 class OutlineService:
     """Service for generating document outlines."""
 
+    def __init__(self):
+        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.model = "claude-sonnet-4-20250514"
+
     async def generate_outline(
         self,
         topic: str,
         research: Dict[str, Any],
-        template_config: Dict[str, Any] = None,
+        template_config: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Generate a document outline.
@@ -23,8 +32,109 @@ class OutlineService:
         Returns:
             Document outline structure.
         """
-        # TODO: Implement outline generation using Claude API
-        raise NotImplementedError("Outline generation not implemented")
+        # Extract key research points for context
+        key_findings = research.get("key_findings", [])[:5]
+        statistics = research.get("statistics", [])[:5]
+        trends = research.get("trends", [])[:3]
+
+        template_guidance = ""
+        if template_config:
+            template_guidance = f"""
+Template specifications:
+- Style: {template_config.get('style', 'professional')}
+- Target length: {template_config.get('target_pages', 8)} pages
+- Sections required: {template_config.get('required_sections', 'executive summary, introduction, main content, conclusion')}
+"""
+
+        prompt = f"""You are a content strategist creating a thought leadership document outline.
+
+Topic: {topic}
+
+Key Research Findings:
+{json.dumps(key_findings, indent=2)}
+
+Relevant Statistics:
+{json.dumps(statistics, indent=2)}
+
+Industry Trends:
+{json.dumps(trends, indent=2)}
+{template_guidance}
+
+Create a comprehensive document outline in the following JSON structure:
+{{
+    "title": "Compelling document title",
+    "subtitle": "Supporting subtitle",
+    "executive_summary": {{
+        "key_points": ["..."],
+        "target_word_count": 300
+    }},
+    "sections": [
+        {{
+            "id": "section_1",
+            "title": "Section Title",
+            "purpose": "What this section accomplishes",
+            "subsections": [
+                {{
+                    "id": "subsection_1_1",
+                    "title": "Subsection Title",
+                    "key_points": ["..."],
+                    "target_word_count": 400,
+                    "include_statistic": true,
+                    "include_chart": false
+                }}
+            ],
+            "target_word_count": 800
+        }}
+    ],
+    "conclusion": {{
+        "key_takeaways": ["..."],
+        "call_to_action": "...",
+        "target_word_count": 300
+    }},
+    "metadata": {{
+        "estimated_total_words": 3500,
+        "estimated_pages": 8,
+        "reading_time_minutes": 15,
+        "difficulty_level": "executive"
+    }}
+}}
+
+Create an outline that would result in a compelling, executive-quality thought leadership document with 6-10 main sections."""
+
+        message = self.client.messages.create(
+            model=self.model,
+            max_tokens=3000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        response_text = message.content[0].text
+
+        try:
+            start = response_text.find("{")
+            end = response_text.rfind("}") + 1
+            if start != -1 and end > start:
+                return json.loads(response_text[start:end])
+        except json.JSONDecodeError:
+            pass
+
+        # Return a basic outline structure if parsing fails
+        return {
+            "title": topic,
+            "subtitle": "",
+            "executive_summary": {"key_points": [], "target_word_count": 300},
+            "sections": [
+                {
+                    "id": "section_1",
+                    "title": "Introduction",
+                    "purpose": "Introduce the topic",
+                    "subsections": [],
+                    "target_word_count": 500,
+                }
+            ],
+            "conclusion": {"key_takeaways": [], "call_to_action": "", "target_word_count": 300},
+            "metadata": {"estimated_total_words": 2000, "estimated_pages": 5},
+            "raw_response": response_text,
+        }
 
     async def refine_outline(
         self,
@@ -41,5 +151,31 @@ class OutlineService:
         Returns:
             Refined outline.
         """
-        # TODO: Implement outline refinement
-        raise NotImplementedError("Outline refinement not implemented")
+        prompt = f"""You are a content strategist refining a document outline based on feedback.
+
+Current Outline:
+{json.dumps(outline, indent=2)}
+
+Feedback for refinement:
+{feedback}
+
+Please refine the outline based on the feedback and return the updated outline in the same JSON structure. Maintain all fields and improve based on the specific feedback provided."""
+
+        message = self.client.messages.create(
+            model=self.model,
+            max_tokens=3000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        response_text = message.content[0].text
+
+        try:
+            start = response_text.find("{")
+            end = response_text.rfind("}") + 1
+            if start != -1 and end > start:
+                return json.loads(response_text[start:end])
+        except json.JSONDecodeError:
+            pass
+
+        # Return original outline if refinement fails
+        return outline
