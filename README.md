@@ -1,1 +1,434 @@
-# aiConnected-paper
+# Paper by aiConnected
+
+<div align="center">
+
+![Paper by aiConnected](https://img.shields.io/badge/Paper-by%20aiConnected-2e95f3?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-2.1-053058?style=for-the-badge)
+![License](https://img.shields.io/badge/license-Proprietary-37404a?style=for-the-badge)
+
+**AI-Powered Thought Leadership Content Platform**
+
+[Demo](https://paper.aiconnected.ai) • [Documentation](#documentation) • [Getting Started](#getting-started) • [Tech Stack](#tech-stack)
+
+</div>
+
+---
+
+## Overview
+
+Paper by aiConnected is a white-label SaaS platform that generates professional thought leadership content for marketing agencies and their clients. The platform produces executive-quality PDF documents with original research, statistics, data visualizations, and professional design—all powered by AI.
+
+### What Makes Paper Different
+
+| Feature | Paper by aiConnected | Typical AI Content Tools |
+|---------|---------------------|--------------------------|
+| **Research Depth** | Deep research from 20-500 sources | Shallow blog scraping (3-5 sources) |
+| **Output Quality** | Consulting-firm quality PDFs | Plain text or basic formatting |
+| **Visual Design** | Dynamic charts, callout boxes, professional typography | Generic templates |
+| **White-Label** | Complete branding control with custom domains | Logo swap only |
+| **Scale** | Programmatic generation via CSV import | Manual UI only |
+
+---
+
+## Key Features
+
+### 🎯 For Marketing Agencies
+- **White-Label Platform** — Full branding customization including custom domains
+- **Multi-Client Management** — Organize and manage all your clients in one place
+- **Team Collaboration** — Role-based access for agency admins, members, and clients
+- **Bulk Generation** — Import CSV files to generate content at scale
+
+### 📄 Content Generation
+- **AI Research Engine** — Deep research synthesis from hundreds of sources
+- **Professional PDFs** — Executive-quality documents with charts and data visualizations
+- **Multiple Templates** — Trend Analysis, Explainers, Predictions, Opinion pieces, and more
+- **Smart Scheduling** — Automate content generation on a recurring basis
+
+### 📊 Distribution & Analytics
+- **Social Media Integration** — Publish directly to LinkedIn, Facebook, Twitter/X, and Google Business
+- **Download Options** — PDF downloads with branded cover pages
+- **Usage Analytics** — Track generation history and API usage
+
+---
+
+## Tech Stack
+
+### Backend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Python | 3.11+ | Primary language |
+| FastAPI | 0.109+ | REST API framework |
+| PostgreSQL | 15+ | Primary database |
+| SQLAlchemy | 2.0+ | ORM |
+| Celery | 5.3+ | Async task processing |
+| Redis | 7+ | Message broker & caching |
+| WeasyPrint | 60+ | PDF generation |
+
+### Frontend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Next.js | 14+ | React framework (App Router) |
+| TypeScript | 5.3+ | Type safety |
+| Tailwind CSS | 3.4+ | Styling |
+| shadcn/ui | Latest | UI components |
+| Zustand | 4+ | Client state |
+| TanStack Query | 5+ | Server state |
+
+### External Services
+| Service | Purpose |
+|---------|---------|
+| Anthropic Claude API | Content generation & research |
+| Freepik API | Stock images |
+| Social APIs | LinkedIn, Facebook, Twitter/X, Google Business |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL 15+
+- Redis 7+
+- Docker & Docker Compose (recommended)
+
+### Quick Start with Docker
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/paper-by-aiconnected.git
+cd paper-by-aiconnected
+
+# Copy environment files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+
+# Start all services
+docker-compose -f docker/docker-compose.yml up -d
+
+# Run database migrations
+docker-compose exec backend alembic upgrade head
+
+# Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Docs: http://localhost:8000/docs
+```
+
+### Manual Setup
+
+#### Backend
+
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Run migrations
+alembic upgrade head
+
+# Start development server
+uvicorn app.main:app --reload --port 8000
+
+# In separate terminals, start Celery workers:
+celery -A app.workers.celery_app worker --loglevel=info
+celery -A app.workers.celery_app beat --loglevel=info
+```
+
+#### Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your configuration
+
+# Start development server
+npm run dev
+```
+
+---
+
+## Project Structure
+
+```
+paper-by-aiconnected/
+├── backend/                    # FastAPI backend
+│   ├── app/
+│   │   ├── main.py            # Application entry point
+│   │   ├── config.py          # Settings & configuration
+│   │   ├── database.py        # Database connection
+│   │   ├── models/            # SQLAlchemy models
+│   │   ├── schemas/           # Pydantic schemas
+│   │   ├── api/v1/            # API routes
+│   │   ├── services/          # Business logic
+│   │   ├── workers/           # Celery tasks
+│   │   └── templates/         # PDF templates (Jinja2)
+│   ├── alembic/               # Database migrations
+│   ├── tests/                 # Backend tests
+│   └── requirements.txt
+│
+├── frontend/                   # Next.js frontend
+│   ├── src/
+│   │   ├── app/               # App Router pages
+│   │   ├── components/        # React components
+│   │   ├── hooks/             # Custom hooks
+│   │   ├── lib/               # Utilities & API client
+│   │   ├── stores/            # Zustand stores
+│   │   └── types/             # TypeScript definitions
+│   ├── public/                # Static assets & logos
+│   └── package.json
+│
+├── docker/                     # Docker configurations
+│   ├── docker-compose.yml     # Development
+│   └── docker-compose.prod.yml # Production
+│
+├── docs/                       # Additional documentation
+├── CLAUDE.md                   # Claude Code project guide
+├── DEVELOPER-PRD.md           # Complete technical specification
+├── UI-UX-DESIGN-SPEC.md       # Design system documentation
+└── README.md                   # This file
+```
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [DEVELOPER-PRD.md](./DEVELOPER-PRD.md) | Complete technical specification (4,400+ lines) covering all systems |
+| [UI-UX-DESIGN-SPEC.md](./UI-UX-DESIGN-SPEC.md) | Design system, components, and UI patterns |
+| [CLAUDE.md](./CLAUDE.md) | Project guide for Claude Code development |
+
+### Key Sections in DEVELOPER-PRD
+
+1. Project Overview & Business Rules
+2. Technology Stack & Dependencies
+3. System Architecture
+4. Database Design (complete schema)
+5. Authentication & Authorization
+6. API Design (all endpoints)
+7. Content Generation Pipeline
+8. PDF Generation System
+9. Distribution System
+10. White-Label System
+11. Deployment Configuration
+12. Frontend Architecture
+
+---
+
+## Environment Variables
+
+### Backend (`backend/.env`)
+
+```env
+# Database
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/paper
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# Security
+SECRET_KEY=your-secret-key-minimum-32-characters
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# External APIs
+ANTHROPIC_API_KEY=sk-ant-...
+FREEPIK_API_KEY=...
+
+# Optional: Social Media APIs
+LINKEDIN_CLIENT_ID=...
+LINKEDIN_CLIENT_SECRET=...
+```
+
+### Frontend (`frontend/.env.local`)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_WS_URL=ws://localhost:8000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+---
+
+## Development
+
+### Running Tests
+
+```bash
+# Backend tests
+cd backend
+pytest
+pytest --cov=app tests/  # With coverage
+
+# Frontend tests
+cd frontend
+npm test
+npm run test:coverage
+```
+
+### Code Quality
+
+```bash
+# Backend
+cd backend
+ruff check .        # Linting
+ruff format .       # Formatting
+mypy app/           # Type checking
+
+# Frontend
+cd frontend
+npm run lint        # ESLint
+npm run lint:fix    # Fix issues
+npm run type-check  # TypeScript
+```
+
+### Database Migrations
+
+```bash
+cd backend
+
+# Create a new migration
+alembic revision --autogenerate -m "description of changes"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback one migration
+alembic downgrade -1
+```
+
+---
+
+## Deployment
+
+Paper by aiConnected is designed for deployment on **Dokploy** (on DigitalOcean), but can be deployed to any Docker-compatible platform.
+
+### Production Build
+
+```bash
+# Build images
+docker-compose -f docker/docker-compose.prod.yml build
+
+# Deploy
+docker-compose -f docker/docker-compose.prod.yml up -d
+```
+
+### Required Infrastructure
+
+- PostgreSQL database (managed recommended)
+- Redis instance
+- Object storage (S3-compatible) for PDFs and uploads
+- SSL certificates (auto-provisioned via Let's Encrypt)
+
+See [DEVELOPER-PRD.md Section 20](./DEVELOPER-PRD.md#20-deployment) for complete deployment instructions.
+
+---
+
+## Brand Guidelines
+
+Paper by aiConnected follows the aiConnected brand identity:
+
+### Colors
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Primary Blue | `#2e95f3` | Primary actions, links |
+| Dark Blue | `#053058` | Secondary elements, headers |
+| Darkest Blue | `#021220` | Text headings |
+| Body Text | `#839aac` | Body copy |
+| Background | `#fafcff` | Page backgrounds |
+| Success | `#22b573` | Success states |
+| Warning | `#ffd56b` | Warning states |
+| Error | `#ed5a5a` | Error states |
+
+### Typography
+- **Headings:** Poppins Extra Bold
+- **Subheadings:** Poppins SemiBold
+- **Body:** Poppins Light
+
+---
+
+## User Roles
+
+| Role | Description | Capabilities |
+|------|-------------|--------------|
+| **Super Admin** | aiConnected platform administrators | Manage agencies, templates, plans, system settings |
+| **Agency Admin** | Agency owners/managers | Full agency access, branding, team management |
+| **Agency Member** | Agency staff | Generate content, review, distribute |
+| **Client** | End customers | View their content, limited generation |
+
+---
+
+## API Overview
+
+The API follows RESTful conventions with JWT authentication.
+
+```
+Base URL: https://paper.aiconnected.ai/api/v1
+```
+
+### Authentication
+```bash
+# Login
+POST /api/v1/auth/login
+Content-Type: application/json
+{"email": "user@example.com", "password": "..."}
+
+# Use token
+GET /api/v1/clients
+Authorization: Bearer <access_token>
+```
+
+### Key Endpoints
+- `POST /api/v1/documents/generate` — Start content generation
+- `GET /api/v1/documents` — List documents
+- `GET /api/v1/clients` — List clients
+- `POST /api/v1/import/csv` — Bulk import
+
+See [DEVELOPER-PRD.md Section 6](./DEVELOPER-PRD.md#6-api-design) for complete API documentation.
+
+---
+
+## Contributing
+
+This is a proprietary project. Please contact the team for contribution guidelines.
+
+---
+
+## Support
+
+For support and questions:
+- **Documentation:** See files in this repository
+- **Issues:** Use the GitHub issue tracker
+- **Contact:** support@aiconnected.ai
+
+---
+
+## License
+
+Copyright © 2026 aiConnected. All rights reserved.
+
+This software is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [aiConnected](https://aiconnected.ai)**
+
+</div>
